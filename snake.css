@@ -5,3 +5,11 @@ td {
   border: 3px solid #333;
   cursor: pointer;
 }
+
+.red-bg {
+  background-color: red;
+}
+
+.border {
+  background-color: #123456;
+}
