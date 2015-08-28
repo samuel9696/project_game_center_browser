@@ -67,6 +67,7 @@ var modelGrid = {
 }
 
 var modelTiles = {
+
   init: function(){
     modelTiles.setBagOfTiles();
     modelTiles.setPlayersTiles();
@@ -89,7 +90,9 @@ var modelTiles = {
   },
 
   player1Tiles : [],
+  score1: 0,
   player2Tiles : [],
+  score2: 0,
 
   setPlayersTiles: function(){
     var randLetter = ""
@@ -110,13 +113,36 @@ var modelTiles = {
   },
 
   isValidMove: function() {
+    //Sorted list of ids of tiles that was played during this turn which are numbers
     modelTiles.attemptedTiles.sort();
-    // for (var i = 0; i < modelTiles.attemptedTiles.length - 1; i++) {
-    //   if (modelTiles.attemptedTiles[i].hasANeighbor) {
 
-    //   };
-    // };
+    //Check horizontal and check vertical
+    if(horizontalCheckMove() || verticalCheckMove()){
+      return true;
+    } else {
+      return false;
+    }   
+  },
 
+  
+
+  horizontalCheckMove: function() {
+    for (var i = 0; i < modelTiles.attemptedTiles.length; i++) {
+      if ($('#'+(modelTiles.attemptedTiles[i]+1)).text().length == 1){continue;
+      } else {
+        return false;
+      }
+    };
+    return true;
+  },
+  verticalCheckMove: function() {
+    for (var i = 0; i < modelTiles.attemptedTiles.length; i++) {
+      if ($('#'+(modelTiles.attemptedTiles[i]+15)).text().length == 1){continue;
+      } else {
+        return false;
+      }
+    };
+    return true;
   }
 }
 
@@ -124,6 +150,7 @@ var view = {
 
   activeTile: null,
   currentBoardTile: null,
+  currentPlayer: "player1-tiles",
 
   showPlayerTiles: function(){
     var p1tilesString = "";
@@ -185,6 +212,7 @@ var view = {
       console.log("You can't place letter here.");
     }
   },
+
   checkRestabs: function(){
 
     for(letter in modelTiles.bagoftiles){
@@ -208,11 +236,18 @@ var view = {
         $("#player2-tiles").append(str)
         break;
       }
+    modelTiles.bagoftiles[randLetter]-=1;
   },
+
   makeTurn: function(){
-    modelTiles.isValidMove();
-    switchplayers();
+    if (modelTiles.isValidMove()){
+      controller.switchplayers();
+    } else {
+      console.log("Move is not valid");
+    }
   }
+
+
 }
 
 var controller = {
@@ -230,6 +265,29 @@ var controller = {
           location.reload();
     });
     $(document).on("click", "#take-turn", view.makeTurn);
+  },
+
+  switchplayers: function() {
+    //Add tiles instead of used one to previous player
+    for(i=0; i<attemptedTiles.length; i++){
+      addNewTiletoSet(currentPlayer);
+    }
+
+    currentPlayer === "player1-tiles" ? currentPlayer = "player2-tiles" : currentPlayer = "player1-tiles"
+    //Fix all new tiles on the board
+    for(i=0; i<attemptedTiles.length; i++){
+      $("#"+attemptedTiles[i]).addClass("fixed")
+    }
+    
+    //Clear attepted array
+    attemptedTiles = []
+
+    //Calculate score for word
+
+    //Hide first player tiles
+
+    //Show tiles for second player
+
   }
 }
 
