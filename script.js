@@ -1,34 +1,31 @@
+"use strict";
+
 var modelSnake = {
-
-  init: function () {
-
-  },
 
   body: [],
 
   checkForFood: function (target) {
     if ($("#" + target).hasClass("glyphicon-apple food")) {
-      $("#" + target).removeClass("glyphicon-apple food")
+      $("#" + target).removeClass("glyphicon-apple food");
       controller.placeFood();
       return true;
-    } else {
-      return false;
     }
+    return false;
   }
 
-}
+};
 
 var modelGrid = {
 
   boardHeight: 20,
   boardWidth: 30,
 
-  init: function(){
+  init: function () {
     modelGrid.buildGrid()
   },
 
 
-  buildGrid: function(){
+  buildGrid: function () {
     var tableString = "<table><tbody>";
     for(var rowPos = 0; rowPos < modelGrid.boardHeight; rowPos++) {
       tableString += "<tr>"
@@ -54,19 +51,18 @@ var modelGrid = {
 var view = {
 
   score: 0,
-  $score: $("#score"),
   currentDirection: null,
 
-  init: function(){
+  init: function () {
     console.log("view init")
     controller.placeSnake();
     controller.placeFood();
   },
 
-  updateScore: function() {
+  updateScore: function () {
+    view.score += 1;
     console.log("Current score is " + view.score)
-    view.$score.text(view.score)
-
+    $("#score").text(view.score)
   }
 }
 
@@ -76,20 +72,20 @@ var controller = {
   timer: null,
   isGameOver: false,
 
-  init: function(){
+  init: function () {
     modelGrid.init();
     view.init();
     controller.setCallbacks();
   },
 
-  setCallbacks: function(){
+  setCallbacks: function () {
     $(window).keydown(controller.moveSnake);
     $(document).on("click", "#play-again", function(){
           location.reload();
     });
   },
 
-  nextSquare: function(code){
+  nextSquare: function(code) {
 
     var headSquareNumber = modelSnake.body[0];
     switch(code){
@@ -121,30 +117,28 @@ var controller = {
     }
   },
 
-  moveSnake: function(event){
+  moveSnake: function(event) {
 
     if (controller.validKey(event.keyCode)) {
-    view.currentDirection = event.keyCode;
-    var targetSquareNumber = controller.nextSquare(view.currentDirection);
+      view.currentDirection = event.keyCode;
+      var targetSquareNumber = controller.nextSquare(view.currentDirection);
       controller.modifySnake(targetSquareNumber);
-      view.updateScore();
     };
 
   },
 
-  modifySnake: function(targetSquareNumber){
+  modifySnake: function(targetSquareNumber) {
     if ($('#' + targetSquareNumber).hasClass("border") || $('#' + targetSquareNumber).hasClass("snake")){
       controller.gameOver();
-      controller.isGameOver = true;
     } else {
       var foundFood = modelSnake.checkForFood(targetSquareNumber);
       modelSnake.body.unshift(targetSquareNumber);
       $('#' + targetSquareNumber).addClass("snake");
-      if (!foundFood) {
+      if (foundFood) {
+        view.updateScore();
+      } else {
         var tail = modelSnake.body.pop();
         $('#' + tail).removeClass("snake");
-      } else {
-        view.score +=1;
       }
     }
     controller.autoMove();
@@ -160,34 +154,36 @@ var controller = {
         controller.modifySnake(controller.nextSquare(view.currentDirection))
       }, speed);
     }
-    console.log("it moves automaticly");
+    console.log("It moves automatically");
   },
 
   gameOver: function() {
+    controller.isGameOver = true;
     clearTimeout(controller.timer);
     $("#play-again").removeClass("hidden");
     $(window).off();
-    alert("Sorry you lost!");
+    alert("Your final score was " + view.score + "! Play again soon!");
   },
 
-  placeSnake: function(){
+  placeSnake: function() {
     do {
       var numberOfsquare = Math.ceil(Math.random()*400);
     } while($('#' + numberOfsquare).hasClass("border"))
+
     $('#' + numberOfsquare).addClass("snake");
     modelSnake.body.push(numberOfsquare);
   },
 
-  placeFood: function(){
+  placeFood: function() {
     do{
       var numberOfsquare = Math.ceil(Math.random()*400);
-      console.log(numberOfsquare);
     } while($('#' + numberOfsquare).hasClass("snake") || $('#' + numberOfsquare).hasClass("border"))
-    console.log(numberOfsquare);
+
     $('#' + numberOfsquare).addClass("glyphicon-apple food");
   }
 }
 
+// $(document).ready(function() {})
 $(function() {
   console.log( "ready!" );
   controller.init();
