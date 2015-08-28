@@ -1,13 +1,13 @@
-#board-container {
+/*#board-container {
   width: 800px;
   height: 800px;
   background: url("https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/Blank_Scrabble_board_with_coordinates.svg/2000px-Blank_Scrabble_board_with_coordinates.svg.png") no-repeat;
   background-size: 70% auto;
-}
+}*/
 
 td {
   height: 33px;
-  width: 25px;
+  width: 40px;
   padding: 0 2px;
   border: 3px solid #123456;
   cursor: pointer;
@@ -17,4 +17,26 @@ td {
 table {
   position: absolute;
   margin: 28px 30px;
+}
+
+.x3ws{
+  background-color: #ea425b;
+}
+
+.x2ls{
+  background-color: #add8e6;
+}
+
+.x2ws{
+  background-color: #e6adcd;
+}
+
+.x3ls{
+  background-color: #6a5bce;
+}
+
+.star{
+  top: 0;
+  background-color: #e8ea42;
+
 }
