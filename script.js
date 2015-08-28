@@ -55,7 +55,8 @@ var view = {
   },
 
   updateScore: function() {
-    $("#score").text(modelSnake.body.length - 1)
+    $("#score").text(view.score)
+
   }
 }
 
@@ -72,9 +73,9 @@ var controller = {
     $(window).keydown(controller.moveSnake);
   },
 
-  moveSnake: function(event){
+  nextSquare: function(code){
     var headSquareNumber = modelSnake.body[0];
-      switch(event.keyCode){
+      switch(code){
         case 37:
           var targetSquareNumber = headSquareNumber-1;
           break;
@@ -93,11 +94,23 @@ var controller = {
 
         default:
           // alert("use arrows only");
-          return;
+          return console.log("wrong key");
 
       }
+      return targetSquareNumber;
+  },
 
-      if ($('#' + targetSquareNumber).hasClass("border") || $('#' + targetSquareNumber).css("background-color") == "rgb(0, 0, 0)"){
+  moveSnake: function(event){
+    
+    view.currentDirection = event.keyCode;
+    var targetSquareNumber = controller.nextSquare(view.currentDirection);  
+    controller.modifySnake(targetSquareNumber);
+    view.updateScore();
+
+  },
+
+  modifySnake: function(targetSquareNumber){
+    if ($('#' + targetSquareNumber).hasClass("border") || $('#' + targetSquareNumber).css("background-color") == "rgb(0, 0, 0)"){
         controller.gameOver();
       } else {
         var flag = modelSnake.checkForFood(targetSquareNumber);
@@ -106,29 +119,37 @@ var controller = {
         if (!flag) {
           var tail = modelSnake.body.pop();
           $('#' + tail).css("background-color","white");
+        } else {
+          view.score +=1;
         }
       }
-    view.currentDirection = event.keyCode;
-    //37-left 38-up 39-right 40-down
-    view.updateScore();
-
-    setTimeout(function() {
-      controller.simulateMove();
-    }, 1000);
-
+      controller.autoMove();
   },
 
-  simulateMove: function() {
-    console.log("here");
-    var e = jQuery.Event("keydown");
-    console.log(e);
-    e.which = view.currentDirection;
-    $(window).trigger(e);
+  timer: null,
+  autoMove: function() {
+    if (view.currentDirection){
+      var speed = 800-view.score*100;
+      if (speed < 200){speed = 200};
+
+      clearTimeout(controller.timer);
+      controller.timer = setTimeout(function(){controller.modifySnake(controller.nextSquare(view.currentDirection))}, speed);
+    }
+    console.log("it moves automaticly");
   },
+
+  // triggerMove: function() {
+  //   console.log("here");
+  //   var e = jQuery.Event("keydown");
+  //   console.log(e);
+  //   e.which = view.currentDirection;
+  //   $(window).trigger(e);
+  // },
 
   gameOver: function() {
-    alert("Sorry you lost!");
+    clearTimeout(controller.timer);
     $(window).off();
+    alert("Sorry you lost!");
   },
 
   placeSnake: function(){
@@ -142,7 +163,7 @@ var controller = {
   placeFood: function(){
     do{
       var numberOfsquare = Math.ceil(Math.random()*400);
-    } while($('#' + numberOfsquare).hasClass("red-bg") || $('#' + numberOfsquare).hasClass("border"))
+    } while($('#' + numberOfsquare).css("background-color")==="rgb(0, 0, 0)" || $('#' + numberOfsquare).hasClass("border"))
 
     $('tr td').eq(numberOfsquare).addClass("red-bg");
   }
