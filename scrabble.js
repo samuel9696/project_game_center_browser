@@ -286,13 +286,13 @@ var controller = {
 
   switchplayers: function() {
     //Add tiles instead of used one to previous player
-    for(i=0; i < view.attemptedTiles.length; i++){
-      addNewTiletoSet(view.currentPlayer);
+    for(i=0; i < modelTiles.attemptedTiles.length; i++){
+      view.addNewTiletoSet(view.currentPlayer);
     }
 
     //Fix all new tiles on the board
-    for(i=0; i < view.attemptedTiles.length; i++){
-      $target = $("#"+ view.attemptedTiles[i])
+    for(i=0; i < modelTiles.attemptedTiles.length; i++){
+      $target = $("#"+ modelTiles.attemptedTiles[i])
       target.addClass("fixed")
       var letter = $target.text();
       // Calculate score for current word
@@ -306,7 +306,7 @@ var controller = {
     $("#score2").text(modelTiles.score2)
 
     //Clear attepted array
-    view.attemptedTiles = [];
+    modelTiles.attemptedTiles = [];
 
     //Hide first player tiles
     view.hidePlayerTiles();
