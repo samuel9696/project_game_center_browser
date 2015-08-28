@@ -1,4 +1,9 @@
-project_gamecenter_browser
+ Snake game:
 ==========================
+Visit page to play the game: https://rawgit.com/ayva/project_game_center_browser/master/snake.html
 
-hiss hiss gulp grow hiss...
+Use arrow keys to navigate the snake. 
+
+Scrabble game:
+==========================
+ Coming soon

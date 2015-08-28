@@ -19,6 +19,14 @@ table {
   margin: 28px 30px;
 }
 
+.tile {
+  height: 45px;
+  width: 45px;
+}
+
+.activeTile{
+  background-color: green;
+}
 .x3ws{
   background-color: #ea425b;
 }

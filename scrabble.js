@@ -14,7 +14,7 @@ var modelGrid = {
       tableString += "<tr>"
       for(var colPos = 1; colPos < modelGrid.boardWidth + 1; colPos++) {
         var idNum = colPos + modelGrid.boardWidth * rowPos - 1;
-        tableString += "<td id = '" + idNum.toString() + "'>"  + "</td>"
+        tableString += "<td class = 'available' id = '" + idNum.toString() + "'>"  + "</td>"
       }
       tableString += "</tr>"
     }
@@ -111,7 +111,7 @@ var modelTiles = {
 
 var view = {
 
-  activeLetter: null,
+  activeTile: null,
 
   showPlayerTiles: function(){
     var p1tilesString = "";
@@ -122,24 +122,74 @@ var view = {
     $("#player1-tiles").append(p1tilesString);
 
     for (var i = 0; i < modelTiles.player2Tiles.length; i++) {
-      p2tilesString += "<div class = 'tile btn btn-primary btn-lg'>" + modelTiles.player1Tiles[i] + "</div>";
+      p2tilesString += "<div class = 'tile btn btn-default btn-lg disabled'>" + "-" +"</div>";
     };
     $("#player2-tiles").append(p2tilesString);
   },
 
+  switchTile:  function(){
+
+  },
+
   setTile: function() {
-    view.activeLetter = event.target;
+    view.activeTile = event.target;
+
+    if ($(view.activeTile).hasClass("activeTile")){
+      $(view.activeTile).removeClass("activeTile");
+      view.activeTile = null;
+    } else {
+      $(view.activeTile).addClass("activeTile"); 
+    }
+    console.log(view.activeTile);
   },
 
   placeTile: function() {
-    var letter = $(view.activeLetter)
-    if (letter) {
+    if (view.activeTile) {
+      var setTile = $(view.activeTile)
       var currentTile = $(event.target);
-      currentTile.text(letter.text());
-      player = letter.parent().attr("id");
-      letter.remove();
-      view.activeLetter = null;
+      currentTile.text(setTile.text());
+      player = setTile.parent().attr("id");
+      currentTile.removeClass("available")
+      setTile.addClass("disabled");
+      view.activeTile = null;
+      //view.addNewTiletoSet(player);
     };
+
+  },
+  checkTile: function(){
+    console.log($(event.target))
+    if ( $(event.target).hasClass("available")){
+      view.placeTile();
+    } else {
+      console.log("You can't place letter here.");
+    }
+  },
+  checkRestabs: function(){
+    
+    for(letter in modelTiles.bagoftiles){
+      if (modelTiles.bagoftiles[letter] !== 0) return true;
+    }
+    return false;
+  },
+
+  addNewTiletoSet: function(targetclass){
+    do{
+      var randLetter = modelTiles.abc[Math.floor(Math.random()*26)]
+    } while(modelTiles.bagoftiles[randLetter]<0 && modelTiles.checkRestabs);
+    var str = "<div class = 'tile btn btn-primary btn-lg'>" + randLetter + "</div>";
+
+    switch(targetclass) {
+      case "player1-tiles": 
+        $("#player1-tiles").append(str)
+        break;
+
+      case "player2-tiles": 
+        $("#player2-tiles").append(str)      
+        break;
+      }
+  },
+  makeTurn: function(){
+
   }
 }
 
@@ -152,11 +202,12 @@ var controller = {
   },
 
   setCallbacks: function () {
-    $(document).on("click", ".tile", view.setTile);
-    $(document).on("click", "#board-container", view.placeTile);
+    $(document).on("click", ".tile.btn-primary", view.setTile);
+    $(document).on("click", "#board-container", view.checkTile);
     $(document).on("click", "#play-again", function(){
           location.reload();
     });
+    $(document).on("click", "#take-turn", view.makeTurn);
   }
 }
 
