@@ -1,13 +1,14 @@
 td {
-  padding: 5px 5px;
-  height: 30px;
-  width: 30px;
+  height: 27px;
+  width: 35px;
+  padding: 0 5px;
   border: 3px solid #123456;
   cursor: pointer;
+  text-align: center;
 }
 
-.red-bg {
-  background-color: red;
+.food {
+  background-color: #D8262C;
 }
 
 .border {
