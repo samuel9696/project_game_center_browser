@@ -293,7 +293,7 @@ var controller = {
     //Fix all new tiles on the board
     for(i=0; i < modelTiles.attemptedTiles.length; i++){
       $target = $("#"+ modelTiles.attemptedTiles[i])
-      target.addClass("fixed")
+      $target.addClass("fixed")
       var letter = $target.text();
       // Calculate score for current word
       if (view.currentPlayer === "player1-tiles") {
