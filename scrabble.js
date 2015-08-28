@@ -14,7 +14,7 @@ var modelGrid = {
       tableString += "<tr>"
       for(var colPos = 1; colPos < modelGrid.boardWidth + 1; colPos++) {
         var idNum = colPos + modelGrid.boardWidth * rowPos - 1;
-        tableString += "<td id = '" + idNum.toString() + "'>"  + "</td>"
+        tableString += "<td class = 'available' id = '" + idNum.toString() + "'>"  + "</td>"
       }
       tableString += "</tr>"
     }
@@ -76,58 +76,144 @@ var modelTiles = {
   bagoftiles: {},
   points: {},
   abc: ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"],
-  
-    setBagOfTiles: function(){
-      var amountOfabc = [9, 2, 2, 4, 12, 2, 3, 2, 9, 1, 1, 4, 2, 6, 8, 2, 1, 6, 4, 6, 4, 2, 2, 1, 2, 1];
-      var pointOfabc = [1, 3, 3, 2, 1, 4, 2, 4, 1, 8, 5, 1, 3, 1, 1, 3, 10, 1, 1, 1, 1, 4, 4, 8, 4, 10]
-      for(i=0; i < modelTiles.abc.length; i++){
-        modelTiles.bagoftiles[modelTiles.abc[i]] = amountOfabc[i];
-        modelTiles.points[modelTiles.abc[i]] = pointOfabc[i];
+
+  setBagOfTiles: function(){
+    var amountOfabc = [9, 2, 2, 4, 12, 2, 3, 2, 9, 1, 1, 4, 2, 6, 8, 2, 1, 6, 4, 6, 4, 2, 2, 1, 2, 1];
+    var pointOfabc = [1, 3, 3, 2, 1, 4, 2, 4, 1, 8, 5, 1, 3, 1, 1, 3, 10, 1, 1, 1, 1, 4, 4, 8, 4, 10]
+    for(i=0; i < modelTiles.abc.length; i++){
+      modelTiles.bagoftiles[modelTiles.abc[i]] = amountOfabc[i];
+      modelTiles.points[modelTiles.abc[i]] = pointOfabc[i];
+    }
+    modelTiles.bagoftiles["blank"]=2;
+  },
+
+  player1Tiles : [],
+  player2Tiles : [],
+
+  setPlayersTiles: function(){
+    var randLetter = ""
+    for(i=0;i<7;i++){
+
+      do{
+        randLetter = modelTiles.abc[Math.floor(Math.random()*26)]
+      } while(modelTiles.bagoftiles[randLetter]<0)
+
+      modelTiles.player1Tiles.push(randLetter)
+      modelTiles.bagoftiles[randLetter] -=1
+      do{
+        randLetter = modelTiles.abc[Math.floor(Math.random()*26)]
+      } while(modelTiles.bagoftiles[randLetter]<0)
+      modelTiles.bagoftiles[randLetter] -=1
+      modelTiles.player2Tiles.push(randLetter)
+    }
+  }
+}
+
+var view = {
+
+  activeTile: null,
+
+  showPlayerTiles: function(){
+    var p1tilesString = "";
+    var p2tilesString = "";
+    for (var i = 0; i < modelTiles.player1Tiles.length; i++) {
+      p1tilesString += "<div class = 'tile btn btn-primary btn-lg'>" + modelTiles.player1Tiles[i] + "</div>";
+    };
+    $("#player1-tiles").append(p1tilesString);
+
+    for (var i = 0; i < modelTiles.player2Tiles.length; i++) {
+      p2tilesString += "<div class = 'tile btn btn-default btn-lg disabled'>" + "-" +"</div>";
+    };
+    $("#player2-tiles").append(p2tilesString);
+  },
+
+  switchTile:  function(){
+
+  },
+
+  setTile: function() {
+    view.activeTile = event.target;
+
+    if ($(view.activeTile).hasClass("activeTile")){
+      $(view.activeTile).removeClass("activeTile");
+      view.activeTile = null;
+    } else {
+      $(view.activeTile).addClass("activeTile"); 
+    }
+    console.log(view.activeTile);
+  },
+
+  placeTile: function() {
+    if (view.activeTile) {
+      var setTile = $(view.activeTile)
+      var currentTile = $(event.target);
+      currentTile.text(setTile.text());
+      player = setTile.parent().attr("id");
+      currentTile.removeClass("available")
+      setTile.addClass("disabled");
+      view.activeTile = null;
+      //view.addNewTiletoSet(player);
+    };
+
+  },
+  checkTile: function(){
+    console.log($(event.target))
+    if ( $(event.target).hasClass("available")){
+      view.placeTile();
+    } else {
+      console.log("You can't place letter here.");
+    }
+  },
+  checkRestabs: function(){
+    
+    for(letter in modelTiles.bagoftiles){
+      if (modelTiles.bagoftiles[letter] !== 0) return true;
+    }
+    return false;
+  },
+
+  addNewTiletoSet: function(targetclass){
+    do{
+      var randLetter = modelTiles.abc[Math.floor(Math.random()*26)]
+    } while(modelTiles.bagoftiles[randLetter]<0 && modelTiles.checkRestabs);
+    var str = "<div class = 'tile btn btn-primary btn-lg'>" + randLetter + "</div>";
+
+    switch(targetclass) {
+      case "player1-tiles": 
+        $("#player1-tiles").append(str)
+        break;
+
+      case "player2-tiles": 
+        $("#player2-tiles").append(str)      
+        break;
       }
-      modelTiles.bagoftiles["blank"]=2;    
-    },
+  },
+  makeTurn: function(){
 
-    player1Tiles : [],
-    player2Tiles : [],
-
-    setPlayersTiles: function(){
-      var randLetter = ""
-      for(i=0;i<7;i++){
-        
-        do{
-          randLetter = modelTiles.abc[Math.floor(Math.random()*26)]
-        } while(modelTiles.bagoftiles[randLetter]<0)
-
-        modelTiles.player1Tiles.push(randLetter)
-        modelTiles.bagoftiles[randLetter] -=1
-        do{
-          randLetter = modelTiles.abc[Math.floor(Math.random()*26)]
-        } while(modelTiles.bagoftiles[randLetter]<0)
-        modelTiles.bagoftiles[randLetter] -=1
-        modelTiles.player2Tiles.push(randLetter)
-      }
-    }
   }
+}
 
-  var view = {
-    showPlayerTiles: function(){
+var controller = {
+  init: function() {
+    modelGrid.init();
+    modelTiles.init();
+    view.showPlayerTiles();
+    controller.setCallbacks();
+  },
 
-      $("#player1-tiles").text(modelTiles.player1Tiles);
-      $("#player2-tiles").text(modelTiles.player2Tiles);
-    }
+  setCallbacks: function () {
+    $(document).on("click", ".tile.btn-primary", view.setTile);
+    $(document).on("click", "#board-container", view.checkTile);
+    $(document).on("click", "#play-again", function(){
+          location.reload();
+    });
+    $(document).on("click", "#take-turn", view.makeTurn);
   }
+}
 
-  var controller = {
-    init: function() {
-      modelGrid.init();
-      modelTiles.init();
-      view.showPlayerTiles();
-    }
-  }
-
-  $(document).ready(function () {
-    controller.init();
-  })
+$(document).ready(function () {
+  controller.init();
+})
 
 
 
