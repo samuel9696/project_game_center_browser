@@ -32,7 +32,7 @@ var modelGrid = {
       $('table').append('<tr></tr>')
       for(var j=1; j<size+1;j++){
          $('tr').last().append('<td></td>')
-         $('tr td').last().attr("id",j+20*i-1).text(j+20*i-1)
+         $('tr td').last().attr("id",j+20*i-1)
          if (i==0 || j==1 || i == size-1 || j == size){
           $('tr td').last().addClass("border").text("");
          }
@@ -101,24 +101,25 @@ var controller = {
   },
 
   moveSnake: function(event){
-    
+
     view.currentDirection = event.keyCode;
-    var targetSquareNumber = controller.nextSquare(view.currentDirection);  
+    var targetSquareNumber = controller.nextSquare(view.currentDirection);
     controller.modifySnake(targetSquareNumber);
     view.updateScore();
 
   },
 
   modifySnake: function(targetSquareNumber){
-    if ($('#' + targetSquareNumber).hasClass("border") || $('#' + targetSquareNumber).css("background-color") == "rgb(0, 0, 0)"){
+    if ($('#' + targetSquareNumber).hasClass("border") || $('#' + targetSquareNumber).hasClass("snake")){
         controller.gameOver();
+        controller.isGameOver = true;
       } else {
         var flag = modelSnake.checkForFood(targetSquareNumber);
         modelSnake.body.unshift(targetSquareNumber);
-        $('#' + targetSquareNumber).css("background-color","black");
+        $('#' + targetSquareNumber).addClass("snake");
         if (!flag) {
           var tail = modelSnake.body.pop();
-          $('#' + tail).css("background-color","white");
+          $('#' + tail).removeClass("snake");
         } else {
           view.score +=1;
         }
@@ -127,13 +128,18 @@ var controller = {
   },
 
   timer: null,
+  isGameOver: false,
+
   autoMove: function() {
-    if (view.currentDirection){
+    if (view.currentDirection && !controller.isGameOver){
       var speed = 800-view.score*100;
-      if (speed < 200){speed = 200};
+      if (speed < 200) speed = 200;
 
       clearTimeout(controller.timer);
-      controller.timer = setTimeout(function(){controller.modifySnake(controller.nextSquare(view.currentDirection))}, speed);
+      controller.timer = setTimeout(function(){
+        controller.modifySnake(controller.nextSquare(view.currentDirection))
+      }, speed);
+      console.log(controller.timer);
     }
     console.log("it moves automaticly");
   },
@@ -148,6 +154,7 @@ var controller = {
 
   gameOver: function() {
     clearTimeout(controller.timer);
+    console.log(controller.timer);
     $(window).off();
     alert("Sorry you lost!");
   },
@@ -156,16 +163,17 @@ var controller = {
     do {
       var numberOfsquare = Math.ceil(Math.random()*400);
     } while($('#' + numberOfsquare).hasClass("border"))
-    $('#' + numberOfsquare).css("background-color", "black");
+    $('#' + numberOfsquare).addClass("snake");
     modelSnake.body.push(numberOfsquare);
   },
 
   placeFood: function(){
     do{
       var numberOfsquare = Math.ceil(Math.random()*400);
-    } while($('#' + numberOfsquare).css("background-color")==="rgb(0, 0, 0)" || $('#' + numberOfsquare).hasClass("border"))
-
-    $('tr td').eq(numberOfsquare).addClass("red-bg");
+      console.log(numberOfsquare);
+    } while($('#' + numberOfsquare).hasClass("snake") || $('#' + numberOfsquare).hasClass("border"))
+    console.log(numberOfsquare);
+    $('#' + numberOfsquare).addClass("red-bg");
   }
 }
 
