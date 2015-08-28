@@ -20,13 +20,15 @@ var modelSnake = {
 
 var modelGrid = {
 
+  size: 20,
+
   init: function(){
     modelGrid.buildGrid()
   },
 
 
   buildGrid: function(){
-    var size = 20;
+    var size = modelGrid.size;
     $('#board-container').append('<table> </table>');
     for(var i=0; i<size;i++){
       $('table').append('<tr></tr>')
@@ -81,7 +83,7 @@ var controller = {
           break;
 
         case 38:
-          var targetSquareNumber = headSquareNumber-20;
+          var targetSquareNumber = headSquareNumber- modelGrid.size;
           break;
 
         case 39:
@@ -89,7 +91,7 @@ var controller = {
           break;
 
         case 40:
-          var targetSquareNumber = headSquareNumber+20;
+          var targetSquareNumber = headSquareNumber+ modelGrid.size;
           break;
 
         default:
@@ -114,10 +116,10 @@ var controller = {
         controller.gameOver();
         controller.isGameOver = true;
       } else {
-        var flag = modelSnake.checkForFood(targetSquareNumber);
+        var foundFood = modelSnake.checkForFood(targetSquareNumber);
         modelSnake.body.unshift(targetSquareNumber);
         $('#' + targetSquareNumber).addClass("snake");
-        if (!flag) {
+        if (!foundFood) {
           var tail = modelSnake.body.pop();
           $('#' + tail).removeClass("snake");
         } else {
