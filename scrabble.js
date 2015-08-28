@@ -110,6 +110,8 @@ var modelTiles = {
       modelTiles.bagoftiles[randLetter] -=1
       modelTiles.player2Tiles.push(randLetter)
     }
+    console.log(modelTiles.player1Tiles);
+    console.log(modelTiles.player2Tiles);
   },
 
   isValidMove: function() {
@@ -164,6 +166,7 @@ var view = {
     var p2tilesString = "";
     for (var i = 0; i < modelTiles.player1Tiles.length; i++) {
       p1tilesString += "<div class = 'tile btn btn-primary btn-lg'>" + modelTiles.player1Tiles[i] + "</div>";
+
     };
     $("#player1-tiles").append(p1tilesString);
 
@@ -173,10 +176,7 @@ var view = {
     $("#player2-tiles").append(p2tilesString);
   },
 
-  switchTile:  function(){
-
-  },
-
+  //For players set of Tiles we show active
   setTile: function() {
     view.activeTile = event.target;
 
@@ -200,7 +200,7 @@ var view = {
       view.currentBoardTile.removeClass("available")
       $setTile.addClass("disabled");
       view.activeTile = null;
-      //view.addNewTiletoSet(player);
+  
     };
   },
 
@@ -234,15 +234,18 @@ var view = {
     do{
       var randLetter = modelTiles.abc[Math.floor(Math.random()*26)]
     } while(modelTiles.bagoftiles[randLetter]<0 && modelTiles.checkRestabs);
+
     var str = "<div class = 'tile btn btn-primary btn-lg'>" + randLetter + "</div>";
 
     switch(targetclass) {
       case "player1-tiles":
       $("#player1-tiles").append(str)
+      modelTiles.player1Tiles.push(randLetter)
       break;
 
       case "player2-tiles":
       $("#player2-tiles").append(str)
+      modelTiles.player2Tiles.push(randLetter)
       break;
     }
     modelTiles.bagoftiles[randLetter]-=1;
@@ -257,11 +260,15 @@ var view = {
   },
 
   hidePlayerTiles: function() {
-    $("#" + view.currentPlayer + " div").addClass("disabled btn-default").removeClass("btn-primary");
+    $("#" + view.currentPlayer + " div").addClass("disabled btn-default").removeClass("btn-primary").removeClass("activeTile").text("-");
+
   },
 
   showPlayerTiles: function() {
     $("#" + view.currentPlayer + " div").removeClass("disabled btn-default").addClass("btn-primary");
+    for(i=0; i<modelTiles.player2Tiles.length; i++){
+      $($("#" + view.currentPlayer + " div")[i]).text(modelTiles.player2Tiles[i]);
+    };
   }
 
 
@@ -273,6 +280,7 @@ var controller = {
     modelTiles.init();
     view.placeInitialTiles();
     controller.setCallbacks();
+    controller.addDictionary();
   },
 
   setCallbacks: function () {
@@ -283,10 +291,21 @@ var controller = {
     });
     $(document).on("click", "#take-turn", view.makeTurn);
   },
+  
+  dictionary: {},
+  addDictionary: function(){
+    var arr = $('.dictionary').text().split("\n");
+    for(var i=0; i<arr.length; i++){
+      controller.dictionary[arr[i]] = true
+    }
+    console.log(controller.dictionary["AA"]);
+  },
 
   switchplayers: function() {
     //Add tiles instead of used one to previous player
+    $('#'+view.currentPlayer+' .disabled').remove();
     for(i=0; i < modelTiles.attemptedTiles.length; i++){
+    
       view.addNewTiletoSet(view.currentPlayer);
     }
 
