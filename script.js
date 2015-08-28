@@ -90,16 +90,16 @@ var controller = {
     var headSquareNumber = modelSnake.body[0];
     switch(code){
       case 37:
-      return headSquareNumber-1;
+      return headSquareNumber - 1;
 
       case 38:
-      return headSquareNumber- modelGrid.boardWidth;
+      return headSquareNumber - modelGrid.boardWidth;
 
       case 39:
-      return headSquareNumber+1;
+      return headSquareNumber + 1;
 
       case 40:
-      return headSquareNumber+ modelGrid.boardWidth;
+      return headSquareNumber + modelGrid.boardWidth;
 
       default:
       console.log("use arrows only")
