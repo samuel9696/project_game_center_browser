@@ -114,21 +114,25 @@ var modelTiles = {
 
   isValidMove: function() {
     //Sorted list of ids of tiles that was played during this turn which are numbers
-    modelTiles.attemptedTiles.sort();
+    console.log(modelTiles.attemptedTiles);
+    modelTiles.attemptedTiles.sort(sortNumber);
+    console.log(modelTiles.attemptedTiles);
 
     //Check horizontal and check vertical
-    if(horizontalCheckMove() || verticalCheckMove()){
+    if(modelTiles.horizontalCheckMove() || modelTiles.verticalCheckMove()){
       return true;
     } else {
       return false;
-    }   
+    }
   },
 
-  
+
 
   horizontalCheckMove: function() {
-    for (var i = 0; i < modelTiles.attemptedTiles.length; i++) {
-      if ($('#'+(modelTiles.attemptedTiles[i]+1)).text().length == 1){continue;
+    for (var i = 0; i < modelTiles.attemptedTiles.length - 1; i++) {
+      if ($('#'+(modelTiles.attemptedTiles[i]+1)).text().length == 1){
+        console.log("move valid, checking next one horizontally");
+        continue;
       } else {
         return false;
       }
@@ -136,8 +140,10 @@ var modelTiles = {
     return true;
   },
   verticalCheckMove: function() {
-    for (var i = 0; i < modelTiles.attemptedTiles.length; i++) {
-      if ($('#'+(modelTiles.attemptedTiles[i]+15)).text().length == 1){continue;
+    for (var i = 0; i < modelTiles.attemptedTiles.length - 1; i++) {
+      if ($('#'+(modelTiles.attemptedTiles[i]+15)).text().length == 1){
+        console.log("move valid, checking next one vertically");
+        continue;
       } else {
         return false;
       }
@@ -152,7 +158,8 @@ var view = {
   currentBoardTile: null,
   currentPlayer: "player1-tiles",
 
-  showPlayerTiles: function(){
+  placeInitialTiles: function(){
+    console.log("creating tiles...")
     var p1tilesString = "";
     var p2tilesString = "";
     for (var i = 0; i < modelTiles.player1Tiles.length; i++) {
@@ -184,12 +191,14 @@ var view = {
 
   placeTile: function() {
     if (view.activeTile) {
-      var setTile = $(view.activeTile)
-      var player = setTile.parent().attr("id");
-      view.currentBoardTile.text(setTile.text());
-      modelTiles.attemptedTiles.push(setTile.attr("id"));
+      var $setTile = $(view.activeTile)
+      var player = $setTile.parent().attr("id");
+      view.currentBoardTile.text($setTile.text());
+      console.log(view.currentBoardTile)
+      console.log(view.currentBoardTile.attr("id"))
+      modelTiles.attemptedTiles.push(parseInt(view.currentBoardTile.attr("id")));
       view.currentBoardTile.removeClass("available")
-      setTile.addClass("disabled");
+      $setTile.addClass("disabled");
       view.activeTile = null;
       //view.addNewTiletoSet(player);
     };
@@ -229,13 +238,13 @@ var view = {
 
     switch(targetclass) {
       case "player1-tiles":
-        $("#player1-tiles").append(str)
-        break;
+      $("#player1-tiles").append(str)
+      break;
 
       case "player2-tiles":
-        $("#player2-tiles").append(str)
-        break;
-      }
+      $("#player2-tiles").append(str)
+      break;
+    }
     modelTiles.bagoftiles[randLetter]-=1;
   },
 
@@ -245,6 +254,14 @@ var view = {
     } else {
       console.log("Move is not valid");
     }
+  },
+
+  hidePlayerTiles: function() {
+    $("#" + view.currentPlayer + " div").addClass("disabled btn-default").removeClass("btn-primary");
+  },
+
+  showPlayerTiles: function() {
+    $("#" + view.currentPlayer + " div").removeClass("disabled btn-default").addClass("btn-primary");
   }
 
 
@@ -254,7 +271,7 @@ var controller = {
   init: function() {
     modelGrid.init();
     modelTiles.init();
-    view.showPlayerTiles();
+    view.placeInitialTiles();
     controller.setCallbacks();
   },
 
@@ -262,33 +279,48 @@ var controller = {
     $(document).on("click", ".tile.btn-primary", view.setTile);
     $(document).on("click", "#board-container", view.checkTile);
     $(document).on("click", "#play-again", function(){
-          location.reload();
+      location.reload();
     });
     $(document).on("click", "#take-turn", view.makeTurn);
   },
 
   switchplayers: function() {
     //Add tiles instead of used one to previous player
-    for(i=0; i<attemptedTiles.length; i++){
-      addNewTiletoSet(currentPlayer);
+    for(i=0; i < view.attemptedTiles.length; i++){
+      addNewTiletoSet(view.currentPlayer);
     }
 
-    currentPlayer === "player1-tiles" ? currentPlayer = "player2-tiles" : currentPlayer = "player1-tiles"
     //Fix all new tiles on the board
-    for(i=0; i<attemptedTiles.length; i++){
-      $("#"+attemptedTiles[i]).addClass("fixed")
+    for(i=0; i < view.attemptedTiles.length; i++){
+      $target = $("#"+ view.attemptedTiles[i])
+      target.addClass("fixed")
+      var letter = $target.text();
+      // Calculate score for current word
+      if (view.currentPlayer === "player1-tiles") {
+        modelTiles.score1 += modelTiles.points[letter];
+      } else {
+        modelTiles.score2 += modelTiles.points[letter];
+      }
     }
-    
-    //Clear attepted array
-    attemptedTiles = []
+    $("#score1").text(modelTiles.score1)
+    $("#score2").text(modelTiles.score2)
 
-    //Calculate score for word
+    //Clear attepted array
+    view.attemptedTiles = [];
 
     //Hide first player tiles
+    view.hidePlayerTiles();
+
+    view.currentPlayer === "player1-tiles" ? view.currentPlayer = "player2-tiles" : view.currentPlayer = "player1-tiles"
 
     //Show tiles for second player
+    view.showPlayerTiles();
 
   }
+}
+
+function sortNumber(a,b) {
+    return a - b;
 }
 
 $(document).ready(function () {
