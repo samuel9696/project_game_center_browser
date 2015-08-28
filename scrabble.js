@@ -72,6 +72,7 @@ var modelTiles = {
     modelTiles.setPlayersTiles();
   },
 
+  attemptedTiles: [],
   tiles: 100,
   bagoftiles: {},
   points: {},
@@ -106,12 +107,23 @@ var modelTiles = {
       modelTiles.bagoftiles[randLetter] -=1
       modelTiles.player2Tiles.push(randLetter)
     }
+  },
+
+  isValidMove: function() {
+    modelTiles.attemptedTiles.sort();
+    // for (var i = 0; i < modelTiles.attemptedTiles.length - 1; i++) {
+    //   if (modelTiles.attemptedTiles[i].hasANeighbor) {
+
+    //   };
+    // };
+
   }
 }
 
 var view = {
 
   activeTile: null,
+  currentBoardTile: null,
 
   showPlayerTiles: function(){
     var p1tilesString = "";
@@ -138,7 +150,7 @@ var view = {
       $(view.activeTile).removeClass("activeTile");
       view.activeTile = null;
     } else {
-      $(view.activeTile).addClass("activeTile"); 
+      $(view.activeTile).addClass("activeTile");
     }
     console.log(view.activeTile);
   },
@@ -146,26 +158,35 @@ var view = {
   placeTile: function() {
     if (view.activeTile) {
       var setTile = $(view.activeTile)
-      var currentTile = $(event.target);
-      currentTile.text(setTile.text());
-      player = setTile.parent().attr("id");
-      currentTile.removeClass("available")
+      var player = setTile.parent().attr("id");
+      view.currentBoardTile.text(setTile.text());
+      modelTiles.attemptedTiles.push(setTile.attr("id"));
+      view.currentBoardTile.removeClass("available")
       setTile.addClass("disabled");
       view.activeTile = null;
       //view.addNewTiletoSet(player);
     };
-
   },
+
+  removeTile: function() {
+    var text = view.currentBoardTile.addClass("available").text();
+    view.currentBoardTile.text("");
+    $(".tile:contains('" + text + "')").first().removeClass("disabled activeTile");
+  },
+
   checkTile: function(){
     console.log($(event.target))
-    if ( $(event.target).hasClass("available")){
+    view.currentBoardTile = $(event.target)
+    if ( view.currentBoardTile.hasClass("available")){
       view.placeTile();
+    } else if (!view.currentBoardTile.hasClass("fixed")) {
+      view.removeTile();
     } else {
       console.log("You can't place letter here.");
     }
   },
   checkRestabs: function(){
-    
+
     for(letter in modelTiles.bagoftiles){
       if (modelTiles.bagoftiles[letter] !== 0) return true;
     }
@@ -179,17 +200,18 @@ var view = {
     var str = "<div class = 'tile btn btn-primary btn-lg'>" + randLetter + "</div>";
 
     switch(targetclass) {
-      case "player1-tiles": 
+      case "player1-tiles":
         $("#player1-tiles").append(str)
         break;
 
-      case "player2-tiles": 
-        $("#player2-tiles").append(str)      
+      case "player2-tiles":
+        $("#player2-tiles").append(str)
         break;
       }
   },
   makeTurn: function(){
-
+    modelTiles.isValidMove();
+    switchplayers();
   }
 }
 
