@@ -128,7 +128,7 @@ var modelTiles = {
     }
   },
 
-
+  word: "",
 
   horizontalCheckMove: function() {
     for (var i = 0; i < modelTiles.attemptedTiles.length - 1; i++) {
@@ -139,7 +139,16 @@ var modelTiles = {
         return false;
       }
     };
-    return true;
+    var arr = []
+    for (var i = 0; i < modelTiles.attemptedTiles.length; i++){
+      arr.push($('#'+(modelTiles.attemptedTiles[i])).text());
+    }
+    
+    modelTiles.word = arr.join("")
+    if(controller.dictionary[modelTiles.word] == true){
+      return true;
+    }
+    return false;
   },
   verticalCheckMove: function() {
     for (var i = 0; i < modelTiles.attemptedTiles.length - 1; i++) {
@@ -150,7 +159,17 @@ var modelTiles = {
         return false;
       }
     };
-    return true;
+    var arr = []
+    for (var i = 0; i < modelTiles.attemptedTiles.length; i++){
+      arr.push($('#'+(modelTiles.attemptedTiles[i])).text());
+    }
+    
+    modelTiles.word = arr.join("")
+    if(controller.dictionary[modelTiles.word] == true){
+      return true;
+    }
+    return false;
+
   }
 }
 
@@ -189,13 +208,15 @@ var view = {
     console.log(view.activeTile);
   },
 
+  
+
   placeTile: function() {
     if (view.activeTile) {
       var $setTile = $(view.activeTile)
       var player = $setTile.parent().attr("id");
+      
       view.currentBoardTile.text($setTile.text());
-      console.log(view.currentBoardTile)
-      console.log(view.currentBoardTile.attr("id"))
+     
       modelTiles.attemptedTiles.push(parseInt(view.currentBoardTile.attr("id")));
       view.currentBoardTile.removeClass("available")
       $setTile.addClass("disabled");
@@ -203,10 +224,36 @@ var view = {
 
     };
   },
+  
+  retrieveTileText: function(){
+    var classes = view.currentBoardTile.attr("class").slice(0,4);
+    
+    switch (classes) {
+      case "x3ws":
+        view.currentBoardTile.text("3x\nWS");
+        break;
+
+      case "x2ls":
+        view.currentBoardTile.text("2x\nLS");
+        break;
+      case "x2ws":
+        view.currentBoardTile.text("2x\nWS");
+        break;
+
+      case "x3ls":
+        view.currentBoardTile.text("3x\nLS");
+        break;
+
+      default: 
+        view.currentBoardTile.text("");
+      }
+        
+  },
 
   removeTile: function() {
     var text = view.currentBoardTile.addClass("available").text();
-    view.currentBoardTile.text("");
+    
+    view.retrieveTileText();
     $(".tile:contains('" + text + "').disabled").first().removeClass("disabled activeTile");
     // console.log("we are trying to remove id " + $(view.currentBoardTile).attr("id"))
     modelTiles.attemptedTiles.removeByVal(parseInt($(view.currentBoardTile).attr("id")));
@@ -324,6 +371,7 @@ var controller = {
       $target.addClass("fixed")
       var letter = $target.text();
       // Calculate score for current word
+      //calculateScore(letter);
       if (view.currentPlayer === "player1-tiles") {
         modelTiles.score1 += modelTiles.points[letter];
         modelTiles.player1Tiles.removeByVal(letter);
@@ -331,9 +379,12 @@ var controller = {
         modelTiles.score2 += modelTiles.points[letter];
         modelTiles.player2Tiles.removeByVal(letter);
       }
+  
+      
     }
     $("#score1").text(modelTiles.score1)
     $("#score2").text(modelTiles.score2)
+
 
     //Clear attepted array
     modelTiles.attemptedTiles = [];
@@ -348,6 +399,25 @@ var controller = {
     //Show tiles for second player
     view.showPlayerTiles();
 
+  },
+
+  calculateScore: function(letter){
+    var classes = ""
+    var arrObj = $('#'+modelTiles.attemptedTiles)
+    for(i=0; i< arrObj.length; i++){
+      classes = arrObj[i].attr("class")
+    };
+
+      var classes = $('#'+modelTiles.attemptedTiles)[i].attr("class")
+      .hasClass("")
+
+    if (view.currentPlayer === "player1-tiles") {
+        modelTiles.score1 += modelTiles.points[letter];
+        modelTiles.player1Tiles.removeByVal(letter);
+      } else {
+        modelTiles.score2 += modelTiles.points[letter];
+        modelTiles.player2Tiles.removeByVal(letter);
+      }
   }
 }
 
