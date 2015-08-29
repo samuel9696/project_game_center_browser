@@ -143,7 +143,7 @@ var modelTiles = {
     for (var i = 0; i < modelTiles.attemptedTiles.length; i++){
       arr.push($('#'+(modelTiles.attemptedTiles[i])).text());
     }
-    
+
     modelTiles.word = arr.join("")
     if(controller.dictionary[modelTiles.word] == true){
       return true;
@@ -163,7 +163,7 @@ var modelTiles = {
     for (var i = 0; i < modelTiles.attemptedTiles.length; i++){
       arr.push($('#'+(modelTiles.attemptedTiles[i])).text());
     }
-    
+
     modelTiles.word = arr.join("")
     if(controller.dictionary[modelTiles.word] == true){
       return true;
@@ -208,51 +208,48 @@ var view = {
     console.log(view.activeTile);
   },
 
-  
+
 
   placeTile: function() {
     if (view.activeTile) {
       var $setTile = $(view.activeTile)
       var player = $setTile.parent().attr("id");
-      
       view.currentBoardTile.text($setTile.text());
-     
       modelTiles.attemptedTiles.push(parseInt(view.currentBoardTile.attr("id")));
       view.currentBoardTile.removeClass("available")
       $setTile.addClass("disabled");
       view.activeTile = null;
-
     };
   },
-  
+
   retrieveTileText: function(){
     var classes = view.currentBoardTile.attr("class").slice(0,4);
-    
+
     switch (classes) {
       case "x3ws":
-        view.currentBoardTile.text("3x\nWS");
-        break;
+      view.currentBoardTile.text("3x\nWS");
+      break;
 
       case "x2ls":
-        view.currentBoardTile.text("2x\nLS");
-        break;
+      view.currentBoardTile.text("2x\nLS");
+      break;
       case "x2ws":
-        view.currentBoardTile.text("2x\nWS");
-        break;
+      view.currentBoardTile.text("2x\nWS");
+      break;
 
       case "x3ls":
-        view.currentBoardTile.text("3x\nLS");
-        break;
+      view.currentBoardTile.text("3x\nLS");
+      break;
 
-      default: 
-        view.currentBoardTile.text("");
-      }
-        
+      default:
+      view.currentBoardTile.text("");
+    }
+
   },
 
   removeTile: function() {
     var text = view.currentBoardTile.addClass("available").text();
-    
+
     view.retrieveTileText();
     $(".tile:contains('" + text + "').disabled").first().removeClass("disabled activeTile");
     // console.log("we are trying to remove id " + $(view.currentBoardTile).attr("id"))
@@ -303,9 +300,11 @@ var view = {
 
   makeTurn: function(){
     if (modelTiles.isValidMove()){
+      $("#flash").addClass("hidden")
       controller.switchplayers();
     } else {
       console.log("Move is not valid");
+      $("#flash").addClass("alert-danger").removeClass("hidden").text("We didn't find this move in the dictionary, or your move is not valid, please try again");
     }
   },
 
@@ -379,8 +378,8 @@ var controller = {
         modelTiles.score2 += modelTiles.points[letter];
         modelTiles.player2Tiles.removeByVal(letter);
       }
-  
-      
+
+
     }
     $("#score1").text(modelTiles.score1)
     $("#score2").text(modelTiles.score2)
@@ -408,32 +407,32 @@ var controller = {
       classes = arrObj[i].attr("class")
     };
 
-      var classes = $('#'+modelTiles.attemptedTiles)[i].attr("class")
-      .hasClass("")
+    var classes = $('#'+modelTiles.attemptedTiles)[i].attr("class")
+    .hasClass("")
 
     if (view.currentPlayer === "player1-tiles") {
-        modelTiles.score1 += modelTiles.points[letter];
-        modelTiles.player1Tiles.removeByVal(letter);
-      } else {
-        modelTiles.score2 += modelTiles.points[letter];
-        modelTiles.player2Tiles.removeByVal(letter);
-      }
+      modelTiles.score1 += modelTiles.points[letter];
+      modelTiles.player1Tiles.removeByVal(letter);
+    } else {
+      modelTiles.score2 += modelTiles.points[letter];
+      modelTiles.player2Tiles.removeByVal(letter);
+    }
   }
 }
 
 function sortNumber(a,b) {
-    return a - b;
+  return a - b;
 }
 
 Array.prototype.removeByVal = function() {
-    var what, a = arguments, L = a.length, ax;
-    while (L && this.length) {
-        what = a[--L];
-        while ((ax = this.indexOf(what)) !== -1) {
-            this.splice(ax, 1);
-        }
+  var what, a = arguments, L = a.length, ax;
+  while (L && this.length) {
+    what = a[--L];
+    while ((ax = this.indexOf(what)) !== -1) {
+      this.splice(ax, 1);
     }
-    return this;
+  }
+  return this;
 };
 
 $(document).ready(function () {
