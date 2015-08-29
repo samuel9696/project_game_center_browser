@@ -200,14 +200,17 @@ var view = {
       view.currentBoardTile.removeClass("available")
       $setTile.addClass("disabled");
       view.activeTile = null;
-  
+
     };
   },
 
   removeTile: function() {
     var text = view.currentBoardTile.addClass("available").text();
     view.currentBoardTile.text("");
-    $(".tile:contains('" + text + "')").first().removeClass("disabled activeTile");
+    $(".tile:contains('" + text + "').disabled").first().removeClass("disabled activeTile");
+    // console.log("we are trying to remove id " + $(view.currentBoardTile).attr("id"))
+    modelTiles.attemptedTiles.removeByVal(parseInt($(view.currentBoardTile).attr("id")));
+
   },
 
   checkTile: function(){
@@ -266,8 +269,14 @@ var view = {
 
   showPlayerTiles: function() {
     $("#" + view.currentPlayer + " div").removeClass("disabled btn-default").addClass("btn-primary");
-    for(i=0; i<modelTiles.player2Tiles.length; i++){
-      $($("#" + view.currentPlayer + " div")[i]).text(modelTiles.player2Tiles[i]);
+    if (view.currentPlayer == "player1-tiles") {
+      for(i=0; i<modelTiles.player1Tiles.length; i++){
+        $($("#" + view.currentPlayer + " div")[i]).text(modelTiles.player1Tiles[i]);
+      };
+    } else{
+      for(i=0; i<modelTiles.player2Tiles.length; i++){
+        $($("#" + view.currentPlayer + " div")[i]).text(modelTiles.player2Tiles[i]);
+      };
     };
   }
 
@@ -291,7 +300,7 @@ var controller = {
     });
     $(document).on("click", "#take-turn", view.makeTurn);
   },
-  
+
   dictionary: {},
   addDictionary: function(){
     var arr = $('.dictionary').text().split("\n");
@@ -305,7 +314,7 @@ var controller = {
     //Add tiles instead of used one to previous player
     $('#'+view.currentPlayer+' .disabled').remove();
     for(i=0; i < modelTiles.attemptedTiles.length; i++){
-    
+
       view.addNewTiletoSet(view.currentPlayer);
     }
 
@@ -317,8 +326,10 @@ var controller = {
       // Calculate score for current word
       if (view.currentPlayer === "player1-tiles") {
         modelTiles.score1 += modelTiles.points[letter];
+        modelTiles.player1Tiles.removeByVal(letter);
       } else {
         modelTiles.score2 += modelTiles.points[letter];
+        modelTiles.player2Tiles.removeByVal(letter);
       }
     }
     $("#score1").text(modelTiles.score1)
@@ -330,8 +341,10 @@ var controller = {
     //Hide first player tiles
     view.hidePlayerTiles();
 
-    view.currentPlayer === "player1-tiles" ? view.currentPlayer = "player2-tiles" : view.currentPlayer = "player1-tiles"
+    console.log(view.currentPlayer)
 
+    view.currentPlayer === "player1-tiles" ? view.currentPlayer = "player2-tiles" : view.currentPlayer = "player1-tiles"
+    console.log(view.currentPlayer)
     //Show tiles for second player
     view.showPlayerTiles();
 
@@ -341,6 +354,17 @@ var controller = {
 function sortNumber(a,b) {
     return a - b;
 }
+
+Array.prototype.removeByVal = function() {
+    var what, a = arguments, L = a.length, ax;
+    while (L && this.length) {
+        what = a[--L];
+        while ((ax = this.indexOf(what)) !== -1) {
+            this.splice(ax, 1);
+        }
+    }
+    return this;
+};
 
 $(document).ready(function () {
   controller.init();
