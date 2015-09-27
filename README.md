@@ -1,9 +1,13 @@
- Snake game:
+ Snake:
 ==========================
-Visit page to play the game: https://rawgit.com/ayva/project_game_center_browser/master/snake.html
+Live Demo: https://rawgit.com/david-meza/project_game_center_browser/master/snake.html
 
 Use arrow keys to navigate the snake. 
 
-Scrabble game:
+Scrabble:
 ==========================
- Coming soon
+Live Demo: https://rawgit.com/david-meza/project_game_center_browser/master/scrabble.html
+
+Click on one of your tiles and then click on the board to place it.
+
+
